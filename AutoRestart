@@ -1,0 +1,32 @@
+With GNU date, one can use:
+
+ grep "^$(date -d -1hour +'%Y-%m-%d %H')" test.logs | grep 'exception'| mail -s "exceptions in last hour of test.logs" ImranRazaKhan
+The first step above is to select all log entries from the last hour. This is done with grep by looking for all lines beginning with the year-month-day and hour that matches one hour ago:
+
+grep "^$(date -d -1hour +'%Y-%m-%d %H')" test.logs
+The next step in the pipeline is to select from those lines the ones that have exceptions:
+
+grep 'exception'
+The last step in the pipeline is to send out the mail:
+
+mail -s "exceptions in last hour of test.logs" ImranRazaKhan
+The above sends mail to ImranRazaKhan (or whatever email address you chose) with the subject line of "exceptions in last hour of test.logs".
+
+The convenience of having the -d option to date should not be underestimated. It might seem simple to subtract 1 from the current hour but, if the current hour is 12am, then we need to adjust both the day and the hour. If the hour was 12am on the first of the month, we would also have to change the month. And likewise for year. And, of course, February requires special consideration during leap years.
+
+Adapting the above to Solaris:
+Consider three cases:
+
+Under Solaris 11 or better, the GNU date utility is available at /usr/gnu/bin/date. Thus, we need simply to specify a path for date:
+
+ grep "^$(/usr/gnu/bin/date -d -1hour +'%Y-%m-%d %H')" test.logs | grep 'exception'| mail -s "exceptions in last hour of test.logs" ImranRazaKhan
+Under Solaris 10 or earlier, one can download & install GNU date
+
+If GNU date is still not available, we need to find another way to find the date and time for one hour ago. The simplest workaround is likely to select a timezone that is one hour behind your timezone. If that timezone was, say, Hong Kong, then use:
+
+ grep "^$(TZ=HongKong date +'%Y-%m-%d %H')" test.logs | grep 'exception'| mail -s "exceptions in last hour of test.logs" ImranRazaKhan
+
+
+dt="$(date -d '1 hour ago' "+%m/%d/%Y %H:%M:%S")"
+
+awk -v dt="$dt" '$0 ~ dt && /exceltion/' test.logs
