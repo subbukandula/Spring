@@ -1,0 +1,20 @@
+<jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort"
+    createdFromAPI="true">
+    <jaxws:properties>
+        <entry key="schema-validation-enabled" value="true" />
+    </jaxws:properties>
+</jaxws:client>
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <logger name="org.springframework.web" level="INFO"/>
+
+    <logger name="org.springframework.ws.client.MessageTracing.sent" level="TRACE"/>
+    <logger name="org.springframework.ws.client.MessageTracing.received" level="TRACE"/>
+    <logger name="org.springframework.ws.server.MessageTracing" level="TRACE"/>
+
+</configuration>
