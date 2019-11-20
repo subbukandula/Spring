@@ -1,0 +1,11 @@
+You can define your JobLauncher in some config file and set SimpleAsyncTaskExecutor as task executor 
+which will run jobs async (not waiting for one to complete in order to start next one).
+
+@Bean
+public JobLauncher jobLauncher() {
+    final SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+    jobLauncher.setJobRepository(jobRepository);
+    final SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor();
+    jobLauncher.setTaskExecutor(simpleAsyncTaskExecutor);
+    return jobLauncher;
+ }
