@@ -9,3 +9,27 @@ public JobLauncher jobLauncher() {
     jobLauncher.setTaskExecutor(simpleAsyncTaskExecutor);
     return jobLauncher;
  }
+
+// Generic function to split a list into two sublists in Java
+public static<T> List[] split(List<T> list)
+{
+	// create two empty lists
+	List<T> first = new ArrayList();
+	List<T> second = new ArrayList();
+
+	// get size of the list
+	int size = list.size();
+
+	// process each element of the list and add it to the first list
+	// or second list based on its position
+	for (int i = 0; i < size; i++)
+	{
+		if (i < (size + 1)/2)
+			first.add(list.get(i));
+		else
+			second.add(list.get(i));
+	}
+
+	// return an List array to accommodate both lists
+	return new List[] {first, second};
+}
