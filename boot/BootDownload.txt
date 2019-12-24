@@ -1,0 +1,185 @@
+https://dzone.com/articles/springboot-rest-service-download-files
+
+import java.io.ByteArrayInputStream;
+
+import java.io.ByteArrayOutputStream;
+
+import java.io.IOException;
+
+import java.io.InputStream;
+
+import java.io.OutputStream;
+
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
+
+import java.util.HashMap;
+
+import java.util.Map;
+
+import java.util.Map.Entry;
+
+import java.util.zip.ZipEntry;
+
+import java.util.zip.ZipOutputStream;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.IOUtils;
+
+import org.springframework.stereotype.Controller;
+
+import org.springframework.web.bind.annotation.PathVariable;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+
+public class HbaseRestController {
+
+ @RequestMapping(value = “/files/ {
+
+  file_name
+
+ }”, method = RequestMethod.GET)
+
+ public void getFile(
+
+  @PathVariable(“file_name”) String fileName,
+
+  HttpServletResponse response) {
+
+  String testJson = ” {
+
+   \\
+
+   r\\ n\\\” name\\\”: \\\”Jungle Gym\\\”,
+
+   \\r\\ n\\\” age\\\”: 25\\ r\\ n
+
+  }”;
+
+  try {
+
+   // get your file as InputStream
+
+   InputStream is = new ByteArrayInputStream(testJson.getBytes());
+
+   // copy it to response’s OutputStream
+
+   org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+
+   String filename = ”attachment;” + ”filename = ”+fileName;
+
+   response.setContentType(“application / json”);
+
+   response.setHeader(“Content - Disposition”, “attachment; filename = ”+filename + ”.json”);
+
+   response.flushBuffer();
+
+   System.out.println(“Filename————— -> ”+fileName);
+
+  } catch (IOException ex) {
+
+   System.out.println(“Error writing file to output stream.Filename was“ + fileName + ” == > ”+ex);
+
+   throw new RuntimeException(“IOError writing file to output stream”);
+
+  }
+
+ }
+
+ @RequestMapping(value = ”/downLoadZIPFile”, method = RequestMethod.GET)
+
+  public void downLoadSearchFiles(HttpServletResponse response) {
+
+   Map < String, String > jsonList = new HashMap < > ();
+
+   jsonList.put(“F101”, “ {
+
+    \\
+
+    r\\ n\\\” name\\\”: \\\”TEst\\\”,
+
+    \\r\\ n\\\” age\\\”: 25\\ r\\ n
+
+   }”);
+
+   jsonList.put(“F102”, “ {
+
+    \\
+
+    r\\ n\\\” name\\\”: \\\”Jungle Gym\\\”,
+
+    \\r\\ n\\\” age\\\”: 26\\ r\\ n
+
+   }”);
+
+   jsonList.put(“F103”, “ {
+
+    \\
+
+    r\\ n\\\” name\\\”: \\\”Jungle Gym\\\”,
+
+    \\r\\ n\\\” age\\\”: 27\\ r\\ n
+
+   }”);
+
+   try {
+
+    response.setHeader(“Pragma”, “public”);
+
+    response.setHeader(“Expires”, “0”);
+
+    response.setHeader(“Cache - Control”, “must - revalidate, post - check = 0, pre - check = 0”);
+
+    response.setHeader(“Content - type”, “application - download”);
+
+    response.setHeader(“Content - Disposition”, “attachment; filename = -JSONSearchResultsData - ” +new SimpleDateFormat(“yyyyMMdd”).format(new Date()) + ”.zip”);
+
+    response.setHeader(“Content - Transfer - Encoding”, “binary”);
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+    ZipOutputStream zipOutputStream = new ZipOutputStream(baos);
+
+    for (Entry < String, String > entry: jsonList.entrySet()) {
+
+     ZipEntry e = new ZipEntry(entry.getKey() + new SimpleDateFormat(“yyyyMMdd”).format(new Date()) + ”.” + ”json”);
+
+     e.setSize(entry.getValue().length());
+
+     e.setTime(System.currentTimeMillis());
+
+     zipOutputStream.putNextEntry(e);
+
+     InputStream is = new ByteArrayInputStream(entry.getValue().getBytes());
+
+     IOUtils.copy(is, zipOutputStream);
+
+     is.close();
+
+     zipOutputStream.closeEntry();
+
+    }
+
+    zipOutputStream.close();
+
+    byte[] zipBytes = baos.toByteArray();
+
+    OutputStream outStream = response.getOutputStream();
+
+    outStream.write(zipBytes);
+
+    outStream.close();
+
+    response.flushBuffer();
+
+   } catch (Exception e) {}
+
+  }
+
+ }
